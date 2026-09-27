@@ -9,4 +9,10 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  /** Vérifie que l'API et la base de données répondent */
+  @Get('health')
+  health() {
+    return this.appService.health();
+  }
 }
