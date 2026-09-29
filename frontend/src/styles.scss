@@ -1,0 +1,167 @@
+/* ---------- Thème (même univers visuel que le portfolio) ---------- */
+:root {
+  --bg: #05060f;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+
+  --accent: #38bdf8;
+  --accent-2: #a78bfa;
+  --danger: #f87171;
+  --success: #34d399;
+  --gradient: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
+
+  --radius: 16px;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk', var(--font-sans);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(56, 189, 248, 0.14), transparent 40%),
+    radial-gradient(circle at -10% 110%, rgba(167, 139, 250, 0.12), transparent 40%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Boutons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: #05060f;
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+  }
+}
+
+/* ---------- Formulaires ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font: inherit;
+    color: var(--text);
+    background: rgba(5, 6, 15, 0.6);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &::placeholder {
+      color: var(--text-faint);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    &.invalide {
+      border-color: var(--danger);
+    }
+  }
+
+  .aide-erreur {
+    font-size: 0.8rem;
+    color: var(--danger);
+  }
+}
+
+.alerte-erreur {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  white-space: pre-line;
+  color: #fecaca;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.carte {
+  padding: 28px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

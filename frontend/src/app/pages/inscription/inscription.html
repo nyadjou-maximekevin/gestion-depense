@@ -1,0 +1,67 @@
+<div class="auth-card carte">
+  <div class="logo"><span>€</span> Gestion de dépenses</div>
+
+  <div class="entete">
+    <h1>Créer un compte</h1>
+    <p>Quelques secondes suffisent pour commencer.</p>
+  </div>
+
+  @if (erreur()) {
+    <div class="alerte-erreur" role="alert">{{ erreur() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="envoyer()" novalidate>
+    <div class="field">
+      <label for="nom">Nom</label>
+      <input
+        id="nom"
+        type="text"
+        formControlName="nom"
+        autocomplete="name"
+        placeholder="Maxime"
+        [class.invalide]="invalide('nom')"
+      >
+      @if (invalide('nom')) {
+        <span class="aide-erreur">Le nom est obligatoire.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="toi@exemple.com"
+        [class.invalide]="invalide('email')"
+      >
+      @if (invalide('email')) {
+        <span class="aide-erreur">Entre une adresse email valide.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="motDePasse">Mot de passe</label>
+      <input
+        id="motDePasse"
+        type="password"
+        formControlName="motDePasse"
+        autocomplete="new-password"
+        placeholder="8 caractères minimum"
+        [class.invalide]="invalide('motDePasse')"
+      >
+      @if (invalide('motDePasse')) {
+        <span class="aide-erreur">Le mot de passe doit contenir au moins 8 caractères.</span>
+      }
+    </div>
+
+    <button class="btn btn-primary" type="submit" [disabled]="enCours()">
+      {{ enCours() ? 'Création…' : 'Créer mon compte' }}
+    </button>
+  </form>
+
+  <p class="bas">
+    Déjà un compte ? <a routerLink="/connexion">Se connecter</a>
+  </p>
+</div>
