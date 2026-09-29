@@ -1,0 +1,72 @@
+<div class="fond" (click)="annule.emit()"></div>
+
+<div class="fenetre carte" role="dialog" aria-modal="true" aria-labelledby="titre-formulaire">
+  <div class="entete">
+    <h2 id="titre-formulaire">{{ depense() ? 'Modifier la dépense' : 'Nouvelle dépense' }}</h2>
+    <button class="fermer" type="button" aria-label="Fermer" (click)="annule.emit()">✕</button>
+  </div>
+
+  @if (erreur()) {
+    <div class="alerte-erreur" role="alert">{{ erreur() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="enregistrer()" novalidate>
+    <div class="ligne">
+      <div class="field">
+        <label for="montant">Montant (€)</label>
+        <input
+          #champMontant
+          id="montant"
+          type="number"
+          inputmode="decimal"
+          step="0.01"
+          min="0.01"
+          placeholder="0,00"
+          formControlName="montant"
+          [class.invalide]="invalide('montant')"
+        >
+        @if (invalide('montant')) {
+          <span class="aide-erreur">Entre un montant supérieur à 0.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="date">Date</label>
+        <input id="date" type="date" formControlName="date" [class.invalide]="invalide('date')">
+        @if (invalide('date')) {
+          <span class="aide-erreur">La date est obligatoire.</span>
+        }
+      </div>
+    </div>
+
+    <fieldset class="field">
+      <legend>Catégorie</legend>
+      <div class="categories">
+        @for (categorie of categories; track categorie) {
+          <label class="categorie" [style.--couleur]="style[categorie].couleur">
+            <input type="radio" formControlName="categorie" [value]="categorie">
+            <span>{{ style[categorie].icone }} {{ categorie }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label for="description">Description <span class="facultatif">(facultatif)</span></label>
+      <input
+        id="description"
+        type="text"
+        maxlength="255"
+        placeholder="Ex. : courses de la semaine"
+        formControlName="description"
+      >
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" type="button" (click)="annule.emit()">Annuler</button>
+      <button class="btn btn-primary" type="submit" [disabled]="enCours()">
+        {{ enCours() ? 'Enregistrement…' : depense() ? 'Enregistrer' : 'Ajouter' }}
+      </button>
+    </div>
+  </form>
+</div>

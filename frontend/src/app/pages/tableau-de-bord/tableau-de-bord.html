@@ -1,0 +1,128 @@
+<header class="barre">
+  <div class="logo"><span>€</span> Gestion de dépenses</div>
+  <div class="utilisateur">
+    <span class="nom">{{ auth.user()?.nom }}</span>
+    <button class="btn btn-ghost" type="button" (click)="auth.deconnexion()">Se déconnecter</button>
+  </div>
+</header>
+
+<main class="contenu">
+  <!-- En-tête : titre, navigation par mois, ajout -->
+  <div class="entete">
+    <div>
+      <h1>Mes dépenses</h1>
+      <div class="navigation-mois">
+        <button type="button" aria-label="Mois précédent" (click)="changerMois(-1)">‹</button>
+        <span class="mois">{{ libelleMois() }}</span>
+        <button type="button" aria-label="Mois suivant" (click)="changerMois(1)">›</button>
+        @if (!estMoisCourant()) {
+          <button type="button" class="aujourdhui" (click)="revenirAuMoisCourant()">Ce mois-ci</button>
+        }
+      </div>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="ouvrirAjout()">+ Ajouter une dépense</button>
+  </div>
+
+  <!-- Résumé -->
+  <section class="resume">
+    <div class="carte stat">
+      <span class="libelle">Total {{ categorie() ? '· ' + categorie() : 'du mois' }}</span>
+      <span class="valeur">{{ euros(total()) }}</span>
+    </div>
+    <div class="carte stat">
+      <span class="libelle">Nombre de dépenses</span>
+      <span class="valeur">{{ depenses().length }}</span>
+    </div>
+    <div class="carte stat">
+      <span class="libelle">Poste principal</span>
+      @if (categoriePrincipale(); as principale) {
+        <span class="valeur petite">{{ style[principale.nom].icone }} {{ principale.nom }}</span>
+        <span class="detail">{{ euros(principale.montant) }}</span>
+      } @else {
+        <span class="valeur petite vide">—</span>
+      }
+    </div>
+  </section>
+
+  <!-- Filtre par catégorie -->
+  <div class="filtres" role="group" aria-label="Filtrer par catégorie">
+    <button type="button" class="puce" [class.active]="categorie() === null" (click)="filtrer(null)">
+      Toutes
+    </button>
+    @for (c of categories; track c) {
+      <button
+        type="button"
+        class="puce"
+        [class.active]="categorie() === c"
+        [style.--couleur]="style[c].couleur"
+        (click)="filtrer(c)"
+      >
+        {{ style[c].icone }} {{ c }}
+      </button>
+    }
+  </div>
+
+  @if (erreur()) {
+    <div class="alerte-erreur" role="alert">{{ erreur() }}</div>
+  }
+
+  <!-- Liste -->
+  <section class="carte liste" [class.en-chargement]="chargement()">
+    @for (depense of depenses(); track depense.id) {
+      <div class="depense" [style.--couleur]="style[depense.categorie].couleur">
+        <span class="icone">{{ style[depense.categorie].icone }}</span>
+
+        <div class="infos">
+          <span class="titre">{{ depense.description || depense.categorie }}</span>
+          <span class="meta">{{ depense.categorie }} · {{ jour(depense.date) }}</span>
+        </div>
+
+        <span class="montant">−{{ euros(depense.montant) }}</span>
+
+        <div class="actions">
+          @if (aConfirmer() === depense.id) {
+            <span class="question">Supprimer ?</span>
+            <button type="button" class="action danger" (click)="supprimer(depense)">Oui</button>
+            <button type="button" class="action" (click)="aConfirmer.set(null)">Non</button>
+          } @else {
+            <button
+              type="button"
+              class="action"
+              aria-label="Modifier"
+              title="Modifier"
+              (click)="ouvrirModification(depense)"
+            >✎</button>
+            <button
+              type="button"
+              class="action"
+              aria-label="Supprimer"
+              title="Supprimer"
+              (click)="aConfirmer.set(depense.id)"
+            >🗑</button>
+          }
+        </div>
+      </div>
+    } @empty {
+      @if (!chargement()) {
+        <div class="vide">
+          <span class="grande-icone">🧾</span>
+          <p>
+            Aucune dépense {{ categorie() ? 'dans « ' + categorie() + ' » ' : '' }}en
+            {{ libelleMois().toLowerCase() }}.
+          </p>
+          <button class="btn btn-ghost" type="button" (click)="ouvrirAjout()">Ajouter une dépense</button>
+        </div>
+      } @else {
+        <div class="vide"><p>Chargement…</p></div>
+      }
+    }
+  </section>
+</main>
+
+@if (formulaireOuvert()) {
+  <app-depense-formulaire
+    [depense]="enEdition()"
+    (enregistre)="apresEnregistrement()"
+    (annule)="fermerFormulaire()"
+  />
+}
