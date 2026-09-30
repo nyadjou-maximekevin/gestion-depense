@@ -1,2 +1,8 @@
-/** Adresse de l'API NestJS (sera remplacée par l'URL de production à l'étape 8) */
-export const API_URL = 'http://localhost:3000';
+import { environment } from '../../environments/environment';
+
+/**
+ * Adresse de l'API NestJS.
+ * Angular remplace environment.ts par environment.development.ts en développement
+ * (voir "fileReplacements" dans angular.json).
+ */
+export const API_URL = environment.apiUrl;

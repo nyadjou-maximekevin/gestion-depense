@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { optionsBaseDeDonnees } from './database/data-source.js';
 import { DepensesModule } from './depenses/depenses.module.js';
 
 @Module({
@@ -15,14 +16,9 @@ import { DepensesModule } from './depenses/depenses.module.js';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.getOrThrow<string>('DATABASE_URL'),
-        ssl: true,
-        // Enregistre automatiquement les entités déclarées dans les modules
-        autoLoadEntities: true,
-        // Crée/met à jour les tables à partir des entités : pratique en développement,
-        // à remplacer par des migrations avant la mise en production
-        synchronize: config.get('NODE_ENV') !== 'production',
+        ...optionsBaseDeDonnees(config.getOrThrow<string>('DATABASE_URL')),
+        // Applique au démarrage les migrations pas encore exécutées (idempotent)
+        migrationsRun: true,
       }),
     }),
 
