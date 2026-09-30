@@ -6,7 +6,8 @@ services:
     plan: free
     region: frankfurt # même région que la base Neon
     rootDir: backend
-    buildCommand: npm ci && npm run build
+    # --include=dev : NODE_ENV=production ferait sauter les devDependencies (dont la CLI nest)
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: node dist/main.js
     healthCheckPath: /health
     envVars:
