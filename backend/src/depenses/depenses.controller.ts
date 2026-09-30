@@ -18,6 +18,7 @@ import { CATEGORIES } from './categories.js';
 import { DepensesService } from './depenses.service.js';
 import { CreateDepenseDto } from './dto/create-depense.dto.js';
 import { FiltreDepensesDto } from './dto/filtre-depenses.dto.js';
+import { StatistiquesDto } from './dto/statistiques.dto.js';
 import { UpdateDepenseDto } from './dto/update-depense.dto.js';
 
 // Guard sur tout le contrôleur : chaque route exige un token valide
@@ -29,6 +30,12 @@ export class DepensesController {
   @Get('categories')
   categories() {
     return CATEGORIES;
+  }
+
+  // Déclarée avant @Get(':id') : sinon "statistiques" serait pris pour un id
+  @Get('statistiques')
+  statistiques(@CurrentUser() user: JwtPayload, @Query() { mois }: StatistiquesDto) {
+    return this.depensesService.statistiques(user.sub, mois);
   }
 
   @Post()

@@ -28,6 +28,13 @@
     <div class="carte stat">
       <span class="libelle">Total {{ categorie() ? '· ' + categorie() : 'du mois' }}</span>
       <span class="valeur">{{ euros(total()) }}</span>
+      <!-- Comparaison au mois précédent (dépenser plus = défavorable) -->
+      @if (!categorie() && stats()?.variation !== null && stats()?.variation !== undefined) {
+        @let v = stats()!.variation!;
+        <span class="variation" [class.hausse]="v > 0" [class.baisse]="v < 0">
+          {{ v > 0 ? '▲ +' : v < 0 ? '▼ −' : '= ' }}{{ pourcent(abs(v)) }} % vs mois précédent
+        </span>
+      }
     </div>
     <div class="carte stat">
       <span class="libelle">Nombre de dépenses</span>
@@ -43,6 +50,35 @@
       }
     </div>
   </section>
+
+  <!-- Graphiques -->
+  @if (stats(); as s) {
+    <section class="graphiques">
+      <div class="carte graphique">
+        <div class="titre-graphique">
+          <h2>Répartition</h2>
+          <span>{{ libelleMois() }} · clique pour filtrer</span>
+        </div>
+        <app-graphique-categories
+          [stats]="s"
+          [categorieActive]="categorie()"
+          (choisir)="basculerCategorie($event)"
+        />
+      </div>
+
+      <div class="carte graphique">
+        <div class="titre-graphique">
+          <h2>6 derniers mois</h2>
+          <span>Total mensuel · clique pour y aller</span>
+        </div>
+        <app-graphique-mois
+          [evolution]="s.evolution"
+          [moisActif]="cleMois()"
+          (choisir)="allerAuMois($event)"
+        />
+      </div>
+    </section>
+  }
 
   <!-- Filtre par catégorie -->
   <div class="filtres" role="group" aria-label="Filtrer par catégorie">

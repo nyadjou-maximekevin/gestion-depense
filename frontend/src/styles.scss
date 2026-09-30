@@ -16,6 +16,11 @@
   --success: #34d399;
   --gradient: linear-gradient(120deg, var(--accent) 0%, var(--accent-2) 100%);
 
+  /* Graphiques : couleurs validées (script dataviz) sur la surface des cartes #0e0f18 */
+  --viz-accent: #1d9bdb; /* mise en avant */
+  --viz-gris: #52607a; /* contexte (mis en retrait) */
+  --viz-grille: rgba(255, 255, 255, 0.07);
+
   --radius: 16px;
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Space Grotesk', var(--font-sans);

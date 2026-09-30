@@ -1,15 +1,31 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { DepenseFormulaire } from '../../components/depense-formulaire/depense-formulaire';
+import { GraphiqueCategories } from '../../components/graphique-categories/graphique-categories';
+import { GraphiqueMois } from '../../components/graphique-mois/graphique-mois';
 import { AuthService } from '../../core/auth/auth.service';
-import { CATEGORIES, Categorie, Depense, STYLE_CATEGORIE } from '../../core/depenses/depense.model';
+import {
+  CATEGORIES,
+  Categorie,
+  Depense,
+  STYLE_CATEGORIE,
+  Statistiques,
+} from '../../core/depenses/depense.model';
 import { DepensesService } from '../../core/depenses/depenses.service';
 import { messageErreur } from '../../core/erreur-api';
-import { ajouterMois, bornesDuMois, formatEuros, formatJour, formatMois } from '../../core/format';
+import {
+  ajouterMois,
+  bornesDuMois,
+  formatEuros,
+  formatJour,
+  formatMois,
+  formatPourcent,
+  versIso,
+} from '../../core/format';
 
 @Component({
   selector: 'app-tableau-de-bord',
-  imports: [DepenseFormulaire],
+  imports: [DepenseFormulaire, GraphiqueCategories, GraphiqueMois],
   templateUrl: './tableau-de-bord.html',
   styleUrl: './tableau-de-bord.scss',
 })
@@ -22,17 +38,22 @@ export class TableauDeBord implements OnInit {
   protected readonly style = STYLE_CATEGORIE;
   protected readonly euros = formatEuros;
   protected readonly jour = formatJour;
+  protected readonly pourcent = formatPourcent;
+  protected readonly abs = Math.abs;
 
   // ----- Filtres -----
   protected mois = signal(ajouterMois(new Date(), 0)); // 1er du mois courant
   protected categorie = signal<Categorie | null>(null);
   protected libelleMois = computed(() => formatMois(this.mois()));
+  /** "AAAA-MM" : format attendu par l'API des statistiques */
+  protected cleMois = computed(() => versIso(this.mois()).slice(0, 7));
   protected estMoisCourant = computed(
     () => this.mois().getTime() === ajouterMois(new Date(), 0).getTime(),
   );
 
   // ----- Données -----
   protected depenses = signal<Depense[]>([]);
+  protected stats = signal<Statistiques | null>(null);
   protected chargement = signal(true);
   protected erreur = signal<string | null>(null);
 
@@ -62,18 +83,24 @@ export class TableauDeBord implements OnInit {
     this.chargement.set(true);
     this.erreur.set(null);
 
-    this.requeteEnCours = this.service
-      .lister({ ...bornesDuMois(this.mois()), categorie: this.categorie() ?? undefined })
-      .subscribe({
-        next: (depenses) => {
-          this.depenses.set(depenses);
-          this.chargement.set(false);
-        },
-        error: (e) => {
-          this.erreur.set(messageErreur(e));
-          this.chargement.set(false);
-        },
-      });
+    // forkJoin : lance les deux requêtes en parallèle et attend les deux réponses
+    this.requeteEnCours = forkJoin({
+      depenses: this.service.lister({
+        ...bornesDuMois(this.mois()),
+        categorie: this.categorie() ?? undefined,
+      }),
+      stats: this.service.statistiques(this.cleMois()),
+    }).subscribe({
+      next: ({ depenses, stats }) => {
+        this.depenses.set(depenses);
+        this.stats.set(stats);
+        this.chargement.set(false);
+      },
+      error: (e) => {
+        this.erreur.set(messageErreur(e));
+        this.chargement.set(false);
+      },
+    });
   }
 
   changerMois(decalage: number) {
@@ -84,6 +111,18 @@ export class TableauDeBord implements OnInit {
   revenirAuMoisCourant() {
     this.mois.set(ajouterMois(new Date(), 0));
     this.charger();
+  }
+
+  /** Clic sur une colonne du graphique : "AAAA-MM" → ce mois */
+  allerAuMois(cle: string) {
+    const [annee, mois] = cle.split('-').map(Number);
+    this.mois.set(new Date(annee, mois - 1, 1));
+    this.charger();
+  }
+
+  /** Clic sur une barre de catégorie : filtre, ou retire le filtre si déjà actif */
+  basculerCategorie(categorie: Categorie) {
+    this.filtrer(this.categorie() === categorie ? null : categorie);
   }
 
   filtrer(categorie: Categorie | null) {
@@ -114,9 +153,8 @@ export class TableauDeBord implements OnInit {
   supprimer(depense: Depense) {
     this.service.supprimer(depense.id).subscribe({
       next: () => {
-        // Mise à jour immédiate de l'écran, sans recharger toute la liste
-        this.depenses.update((liste) => liste.filter((d) => d.id !== depense.id));
         this.aConfirmer.set(null);
+        this.charger(); // recharge aussi les statistiques
       },
       error: (e) => this.erreur.set(messageErreur(e)),
     });

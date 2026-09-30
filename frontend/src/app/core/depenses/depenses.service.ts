@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { API_URL } from '../config';
-import { Depense, DepenseSaisie, FiltreDepenses } from './depense.model';
+import { Depense, DepenseSaisie, FiltreDepenses, Statistiques } from './depense.model';
 
 /** Appels à l'API /depenses (le token est ajouté par l'intercepteur) */
 @Injectable({ providedIn: 'root' })
@@ -28,5 +28,10 @@ export class DepensesService {
 
   supprimer(id: string) {
     return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  /** mois au format "AAAA-MM" */
+  statistiques(mois: string) {
+    return this.http.get<Statistiques>(`${this.url}/statistiques`, { params: { mois } });
   }
 }

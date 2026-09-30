@@ -9,5 +9,8 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.spec.ts'],
+    // Le premier chargement de NestJS peut être lent sur une petite machine
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
   },
 });

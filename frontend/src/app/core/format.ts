@@ -13,6 +13,13 @@ export function formatEuros(montant: number): string {
   return euros.format(montant);
 }
 
+const nombre = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
+
+/** 6.89 → "6,89" ; -12.5 → "-12,5" */
+export function formatPourcent(valeur: number): string {
+  return nombre.format(valeur);
+}
+
 /** Date locale → "AAAA-MM-JJ" */
 export function versIso(date: Date): string {
   const mm = String(date.getMonth() + 1).padStart(2, '0');

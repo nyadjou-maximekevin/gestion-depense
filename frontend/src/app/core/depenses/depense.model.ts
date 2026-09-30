@@ -46,6 +46,20 @@ export interface DepenseSaisie {
   date: string;
 }
 
+/** Réponse de GET /depenses/statistiques?mois=AAAA-MM */
+export interface Statistiques {
+  mois: string;
+  total: number;
+  nombre: number;
+  totalMoisPrecedent: number;
+  /** Variation en % vs le mois précédent (null si le mois précédent est vide) */
+  variation: number | null;
+  /** Trié du plus gros au plus petit total */
+  parCategorie: { categorie: Categorie; total: number; nombre: number }[];
+  /** 6 derniers mois, du plus ancien au mois demandé */
+  evolution: { mois: string; total: number }[];
+}
+
 export interface FiltreDepenses {
   du?: string;
   au?: string;

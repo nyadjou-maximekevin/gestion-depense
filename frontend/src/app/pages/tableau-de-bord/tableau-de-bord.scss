@@ -140,6 +140,56 @@
   }
 }
 
+.variation {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+
+  &.hausse {
+    color: #fca5a5;
+  }
+
+  &.baisse {
+    color: #6ee7b7;
+  }
+}
+
+/* ---------- Graphiques ---------- */
+.graphiques {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.graphique {
+  padding: 22px;
+  min-width: 0;
+}
+
+.titre-graphique {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+
+  h2 {
+    font-size: 1.05rem;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: var(--text-faint);
+  }
+}
+
+@media (max-width: 860px) {
+  .graphiques {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Filtres ---------- */
 .filtres {
   display: flex;
