@@ -6,6 +6,7 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { optionsBaseDeDonnees } from './database/data-source.js';
 import { DepensesModule } from './depenses/depenses.module.js';
+import { DemoModule } from './demo/demo.module.js';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DepensesModule } from './depenses/depenses.module.js';
 
     AuthModule,
     DepensesModule,
+    DemoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

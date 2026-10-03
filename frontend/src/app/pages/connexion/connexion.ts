@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { messageErreur } from '../../core/erreur-api';
 
@@ -21,6 +22,9 @@ export class Connexion {
   });
 
   enCours = signal(false);
+  enCoursDemo = signal(false);
+  /** L'API gratuite (Render) s'endort : la première requête peut prendre ~1 minute */
+  serveurLent = signal(false);
   erreur = signal<string | null>(null);
 
   /** Affiche l'erreur d'un champ seulement après que l'utilisateur l'a touché */
@@ -34,15 +38,35 @@ export class Connexion {
       this.form.markAllAsTouched();
       return;
     }
+    this.lancer(this.auth.connexion(this.form.getRawValue()));
+  }
 
+  essayerDemo() {
+    this.enCoursDemo.set(true);
+    this.lancer(this.auth.demo());
+  }
+
+  /** Envoie la requête, affiche un message si le serveur met du temps à se réveiller */
+  private lancer(requete: Observable<unknown>) {
     this.enCours.set(true);
     this.erreur.set(null);
+    const minuteur = setTimeout(() => this.serveurLent.set(true), 4000);
 
-    this.auth.connexion(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigate(['/']),
+    const terminer = () => {
+      clearTimeout(minuteur);
+      this.serveurLent.set(false);
+      this.enCours.set(false);
+      this.enCoursDemo.set(false);
+    };
+
+    requete.subscribe({
+      next: () => {
+        terminer();
+        this.router.navigate(['/']);
+      },
       error: (e) => {
+        terminer();
         this.erreur.set(messageErreur(e));
-        this.enCours.set(false);
       },
     });
   }

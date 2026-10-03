@@ -34,6 +34,13 @@ export class AuthService {
       .pipe(tap((reponse) => this.ouvrirSession(reponse)));
   }
 
+  /** Compte de démonstration : données réinitialisées côté API à chaque connexion */
+  demo(): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${API_URL}/auth/demo`, {})
+      .pipe(tap((reponse) => this.ouvrirSession(reponse)));
+  }
+
   deconnexion() {
     this._token.set(null);
     this._user.set(null);

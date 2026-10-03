@@ -60,3 +60,46 @@ form {
   font-size: 0.92rem;
   color: var(--text-muted);
 }
+
+/* "ou" entre deux lignes fines */
+.separateur {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  color: var(--text-faint);
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: -8px;
+
+  .btn {
+    width: 100%;
+  }
+
+  .aide {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+  }
+}
+
+.attente {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #fde68a;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}

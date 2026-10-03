@@ -42,9 +42,24 @@
     </div>
 
     <button class="btn btn-primary" type="submit" [disabled]="enCours()">
-      {{ enCours() ? 'Connexion…' : 'Se connecter' }}
+      {{ enCours() && !enCoursDemo() ? 'Connexion…' : 'Se connecter' }}
     </button>
   </form>
+
+  <div class="separateur"><span>ou</span></div>
+
+  <div class="demo">
+    <button class="btn btn-ghost" type="button" [disabled]="enCours()" (click)="essayerDemo()">
+      {{ enCoursDemo() ? 'Préparation de la démo…' : '✨ Essayer la démo' }}
+    </button>
+    <span class="aide">Compte rempli avec 6 mois de dépenses, sans inscription.</span>
+  </div>
+
+  @if (serveurLent()) {
+    <p class="attente" role="status">
+      ⏳ Le serveur gratuit se réveille, cela peut prendre jusqu'à une minute…
+    </p>
+  }
 
   <p class="bas">
     Pas encore de compte ? <a routerLink="/inscription">Créer un compte</a>
