@@ -20,7 +20,12 @@ export class AuthService {
 
     // bcrypt ajoute un "sel" aléatoire : deux mots de passe identiques donnent des hash différents
     const motDePasseHash = await bcrypt.hash(dto.motDePasse, 10);
-    const user = await this.usersService.create({ email: dto.email, nom: dto.nom, motDePasseHash });
+    const user = await this.usersService.create({
+      email: dto.email,
+      nom: dto.nom,
+      devise: dto.devise,
+      motDePasseHash,
+    });
 
     return { accessToken: await this.signer(user.id, user.email), user };
   }

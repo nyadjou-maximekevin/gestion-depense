@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnInit,
   afterNextRender,
+  computed,
   inject,
   input,
   output,
@@ -13,7 +14,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CATEGORIES, Categorie, Depense, STYLE_CATEGORIE } from '../../core/depenses/depense.model';
 import { DepensesService } from '../../core/depenses/depenses.service';
 import { messageErreur } from '../../core/erreur-api';
-import { versIso } from '../../core/format';
+import { decimalesDevise, symboleDevise, versIso } from '../../core/format';
 
 /**
  * Fenêtre d'ajout / modification d'une dépense.
@@ -31,6 +32,10 @@ import { versIso } from '../../core/format';
 })
 export class DepenseFormulaire implements OnInit {
   depense = input<Depense | null>(null);
+  /** Devise de l'utilisateur : symbole affiché et nombre de décimales autorisées */
+  devise = input('EUR');
+  protected symbole = computed(() => symboleDevise(this.devise()));
+  protected decimales = computed(() => decimalesDevise(this.devise()));
 
   /** Émis avec la dépense enregistrée (créée ou modifiée) */
   enregistre = output<Depense>();
@@ -82,8 +87,8 @@ export class DepenseFormulaire implements OnInit {
 
     const { montant, categorie, description, date } = this.form.getRawValue();
     const saisie = {
-      // arrondi au centime : 12.345 → 12.35
-      montant: Math.round(montant! * 100) / 100,
+      // arrondi selon la devise : 12.345 € → 12.35 ; 1234.5 FCFA → 1235
+      montant: Math.round(montant! * 10 ** this.decimales()) / 10 ** this.decimales(),
       categorie: categorie!,
       description: description?.trim() ?? '',
       date: date!,

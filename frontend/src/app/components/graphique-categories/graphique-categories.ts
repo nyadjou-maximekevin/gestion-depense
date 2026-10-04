@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { Categorie, STYLE_CATEGORIE, Statistiques } from '../../core/depenses/depense.model';
-import { formatEuros } from '../../core/format';
+import { formatMontant } from '../../core/format';
 
 /**
  * Répartition du mois par catégorie : barres horizontales triées, une seule couleur.
@@ -121,6 +121,7 @@ import { formatEuros } from '../../core/format';
 export class GraphiqueCategories {
   stats = input.required<Statistiques>();
   categorieActive = input<Categorie | null>(null);
+  devise = input('EUR');
   choisir = output<Categorie>();
 
   protected lignes = computed(() => {
@@ -129,7 +130,7 @@ export class GraphiqueCategories {
     return parCategorie.map((c) => ({
       categorie: c.categorie,
       icone: STYLE_CATEGORIE[c.categorie].icone,
-      montant: formatEuros(c.total),
+      montant: formatMontant(c.total, this.devise()),
       largeur: max ? (c.total / max) * 100 : 0,
       pourcentage: total ? Math.round((c.total / total) * 100) : 0,
     }));

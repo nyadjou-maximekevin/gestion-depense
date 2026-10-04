@@ -13,15 +13,15 @@
   <form [formGroup]="form" (ngSubmit)="enregistrer()" novalidate>
     <div class="ligne">
       <div class="field">
-        <label for="montant">Montant (€)</label>
+        <label for="montant">Montant ({{ symbole() }})</label>
         <input
           #champMontant
           id="montant"
           type="number"
           inputmode="decimal"
-          step="0.01"
-          min="0.01"
-          placeholder="0,00"
+          [step]="decimales() ? 0.01 : 1"
+          [min]="decimales() ? 0.01 : 1"
+          [placeholder]="decimales() ? '0,00' : '0'"
           formControlName="montant"
           [class.invalide]="invalide('montant')"
         >

@@ -3,7 +3,15 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { API_URL } from '../config';
-import { AuthResponse, Identifiants, Inscription, User } from '../models';
+import {
+  AuthResponse,
+  DEVISE_PAR_DEFAUT,
+  Devise,
+  Identifiants,
+  Inscription,
+  Profil,
+  User,
+} from '../models';
 
 const CLE_TOKEN = 'gd_token';
 const CLE_USER = 'gd_user';
@@ -21,6 +29,8 @@ export class AuthService {
   readonly token = this._token.asReadonly();
   readonly user = this._user.asReadonly();
   readonly estConnecte = computed(() => this._token() !== null);
+  /** Devise de l'utilisateur connecté, utilisée pour afficher tous les montants */
+  readonly devise = computed<Devise>(() => this._user()?.devise ?? DEVISE_PAR_DEFAUT);
 
   connexion(identifiants: Identifiants): Observable<AuthResponse> {
     return this.http
@@ -41,6 +51,17 @@ export class AuthService {
       .pipe(tap((reponse) => this.ouvrirSession(reponse)));
   }
 
+  /** Recharge le profil depuis l'API (ex. une session enregistrée avant l'ajout de la devise) */
+  rafraichirProfil(): Observable<User> {
+    return this.http.get<User>(`${API_URL}/auth/me`).pipe(tap((user) => this.enregistrerUser(user)));
+  }
+
+  modifierProfil(profil: Profil): Observable<User> {
+    return this.http
+      .patch<User>(`${API_URL}/auth/me`, profil)
+      .pipe(tap((user) => this.enregistrerUser(user)));
+  }
+
   deconnexion() {
     this._token.set(null);
     this._user.set(null);
@@ -51,8 +72,12 @@ export class AuthService {
 
   private ouvrirSession({ accessToken, user }: AuthResponse) {
     this._token.set(accessToken);
-    this._user.set(user);
     ecrire(CLE_TOKEN, accessToken);
+    this.enregistrerUser(user);
+  }
+
+  private enregistrerUser(user: User) {
+    this._user.set(user);
     ecrire(CLE_USER, JSON.stringify(user));
   }
 }

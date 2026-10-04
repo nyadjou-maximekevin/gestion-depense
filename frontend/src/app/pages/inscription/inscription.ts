@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { messageErreur } from '../../core/erreur-api';
+import { DEVISE_PAR_DEFAUT, DEVISES, Devise, NOMS_DEVISES } from '../../core/models';
 
 @Component({
   selector: 'app-inscription',
@@ -19,7 +20,11 @@ export class InscriptionPage {
     nom: ['', [Validators.required, Validators.maxLength(80)]],
     email: ['', [Validators.required, Validators.email]],
     motDePasse: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+    devise: [DEVISE_PAR_DEFAUT as Devise, Validators.required],
   });
+
+  protected readonly devises = DEVISES;
+  protected readonly nomsDevises = NOMS_DEVISES;
 
   enCours = signal(false);
   erreur = signal<string | null>(null);

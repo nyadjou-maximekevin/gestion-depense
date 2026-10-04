@@ -22,5 +22,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/tableau-de-bord/tableau-de-bord').then((m) => m.TableauDeBord),
   },
+  {
+    path: 'parametres',
+    title: 'Paramètres — Gestion de dépenses',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/parametres/parametres').then((m) => m.Parametres),
+  },
   { path: '**', redirectTo: '' },
 ];

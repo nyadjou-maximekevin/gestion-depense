@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { DEVISES, type Devise } from '../../users/devises.js';
 
 /** Données attendues par POST /auth/register */
 export class RegisterDto {
@@ -17,4 +18,9 @@ export class RegisterDto {
   @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
   @MaxLength(72) // limite de bcrypt
   motDePasse: string;
+
+  /** Facultatif : EUR par défaut */
+  @IsOptional()
+  @IsIn(DEVISES, { message: `Devise invalide. Valeurs possibles : ${DEVISES.join(', ')}` })
+  devise?: Devise;
 }

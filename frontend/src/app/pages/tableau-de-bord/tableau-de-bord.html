@@ -2,6 +2,7 @@
   <div class="logo"><span>€</span> Gestion de dépenses</div>
   <div class="utilisateur">
     <span class="nom">{{ auth.user()?.nom }}</span>
+    <a class="btn btn-ghost" routerLink="/parametres" aria-label="Paramètres" title="Paramètres">⚙</a>
     <button class="btn btn-ghost" type="button" (click)="auth.deconnexion()">Se déconnecter</button>
   </div>
 </header>
@@ -27,7 +28,7 @@
   <section class="resume">
     <div class="carte stat">
       <span class="libelle">Total {{ categorie() ? '· ' + categorie() : 'du mois' }}</span>
-      <span class="valeur">{{ euros(total()) }}</span>
+      <span class="valeur">{{ montant(total()) }}</span>
       <!-- Comparaison au mois précédent (dépenser plus = défavorable) -->
       @if (!categorie() && stats()?.variation !== null && stats()?.variation !== undefined) {
         @let v = stats()!.variation!;
@@ -44,7 +45,7 @@
       <span class="libelle">Poste principal</span>
       @if (categoriePrincipale(); as principale) {
         <span class="valeur petite">{{ style[principale.nom].icone }} {{ principale.nom }}</span>
-        <span class="detail">{{ euros(principale.montant) }}</span>
+        <span class="detail">{{ montant(principale.montant) }}</span>
       } @else {
         <span class="valeur petite vide">—</span>
       }
@@ -62,6 +63,7 @@
         <app-graphique-categories
           [stats]="s"
           [categorieActive]="categorie()"
+          [devise]="auth.devise()"
           (choisir)="basculerCategorie($event)"
         />
       </div>
@@ -74,6 +76,7 @@
         <app-graphique-mois
           [evolution]="s.evolution"
           [moisActif]="cleMois()"
+          [devise]="auth.devise()"
           (choisir)="allerAuMois($event)"
         />
       </div>
@@ -113,7 +116,7 @@
           <span class="meta">{{ depense.categorie }} · {{ jour(depense.date) }}</span>
         </div>
 
-        <span class="montant">−{{ euros(depense.montant) }}</span>
+        <span class="montant">−{{ montant(depense.montant) }}</span>
 
         <div class="actions">
           @if (aConfirmer() === depense.id) {
@@ -158,6 +161,7 @@
 @if (formulaireOuvert()) {
   <app-depense-formulaire
     [depense]="enEdition()"
+    [devise]="auth.devise()"
     (enregistre)="apresEnregistrement()"
     (annule)="fermerFormulaire()"
   />

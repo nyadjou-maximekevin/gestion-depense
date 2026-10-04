@@ -56,6 +56,15 @@
       }
     </div>
 
+    <div class="field">
+      <label for="devise">Devise</label>
+      <select id="devise" formControlName="devise">
+        @for (d of devises; track d) {
+          <option [value]="d">{{ nomsDevises[d] }}</option>
+        }
+      </select>
+    </div>
+
     <button class="btn btn-primary" type="submit" [disabled]="enCours()">
       {{ enCours() ? 'Création…' : 'Créer mon compte' }}
     </button>

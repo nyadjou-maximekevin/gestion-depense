@@ -4,13 +4,36 @@
  * et peut décaler d'un jour (ex. minuit à Paris = 22h la veille en UTC).
  */
 
-const euros = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 const jourCourt = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
 const moisLong = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
 
-/** 1234.5 → "1 234,50 €" */
-export function formatEuros(montant: number): string {
-  return euros.format(montant);
+// Créer un Intl.NumberFormat est coûteux : un seul par devise, réutilisé
+const formatsDevise = new Map<string, Intl.NumberFormat>();
+function formatDevise(devise: string) {
+  let format = formatsDevise.get(devise);
+  if (!format) {
+    format = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: devise });
+    formatsDevise.set(devise, format);
+  }
+  return format;
+}
+
+/**
+ * Montant dans la devise de l'utilisateur, au format français.
+ * 1234.5 EUR → "1 234,50 €" · USD → "1 234,50 $US" · XAF → "1 235 FCFA" (le franc CFA n'a pas de centimes)
+ */
+export function formatMontant(montant: number, devise: string = 'EUR'): string {
+  return formatDevise(devise).format(montant);
+}
+
+/** Symbole seul : EUR → "€", XAF → "FCFA" */
+export function symboleDevise(devise: string = 'EUR'): string {
+  return formatDevise(devise).formatToParts(0).find((p) => p.type === 'currency')?.value ?? devise;
+}
+
+/** Nombre de décimales de la devise : 2 pour EUR, 0 pour XAF */
+export function decimalesDevise(devise: string = 'EUR'): number {
+  return formatDevise(devise).resolvedOptions().maximumFractionDigits ?? 2;
 }
 
 const nombre = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });

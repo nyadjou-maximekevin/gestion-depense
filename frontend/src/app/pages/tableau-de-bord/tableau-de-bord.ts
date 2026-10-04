@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Subscription, forkJoin } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import { DepenseFormulaire } from '../../components/depense-formulaire/depense-formulaire';
 import { GraphiqueCategories } from '../../components/graphique-categories/graphique-categories';
 import { GraphiqueMois } from '../../components/graphique-mois/graphique-mois';
@@ -16,7 +17,7 @@ import { messageErreur } from '../../core/erreur-api';
 import {
   ajouterMois,
   bornesDuMois,
-  formatEuros,
+  formatMontant,
   formatJour,
   formatMois,
   formatPourcent,
@@ -25,7 +26,7 @@ import {
 
 @Component({
   selector: 'app-tableau-de-bord',
-  imports: [DepenseFormulaire, GraphiqueCategories, GraphiqueMois],
+  imports: [DepenseFormulaire, GraphiqueCategories, GraphiqueMois, RouterLink],
   templateUrl: './tableau-de-bord.html',
   styleUrl: './tableau-de-bord.scss',
 })
@@ -36,7 +37,8 @@ export class TableauDeBord implements OnInit {
   // Helpers utilisables dans le template
   protected readonly categories = CATEGORIES;
   protected readonly style = STYLE_CATEGORIE;
-  protected readonly euros = formatEuros;
+  /** Formate un montant dans la devise de l'utilisateur connecté */
+  protected readonly montant = (valeur: number) => formatMontant(valeur, this.auth.devise());
   protected readonly jour = formatJour;
   protected readonly pourcent = formatPourcent;
   protected readonly abs = Math.abs;
@@ -75,6 +77,8 @@ export class TableauDeBord implements OnInit {
 
   ngOnInit() {
     this.charger();
+    // Met à jour le profil (devise) si la session date d'avant cette fonctionnalité
+    if (!this.auth.user()?.devise) this.auth.rafraichirProfil().subscribe({ error: () => {} });
   }
 
   charger() {

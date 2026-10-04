@@ -24,7 +24,13 @@ export class UsersService {
     return this.users.existsBy({ email });
   }
 
-  async create(data: { email: string; nom: string; motDePasseHash: string }) {
+  /** Met à jour le profil et renvoie l'utilisateur à jour (sans hash) */
+  async update(id: string, data: Partial<Pick<User, 'nom' | 'devise'>>) {
+    await this.users.update({ id }, data);
+    return this.findById(id);
+  }
+
+  async create(data: Pick<User, 'email' | 'nom' | 'motDePasseHash'> & Partial<Pick<User, 'devise'>>) {
     const user = await this.users.save(this.users.create(data));
     // On ne renvoie jamais le hash, même juste après la création
     const { motDePasseHash: _, ...sansHash } = user;

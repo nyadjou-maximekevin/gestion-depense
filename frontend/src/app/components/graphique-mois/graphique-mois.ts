@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { formatEuros } from '../../core/format';
+import { formatMontant } from '../../core/format';
 
 /** Arrondit vers le haut à une valeur "ronde" pour l'axe : 83 → 100, 1340 → 2000, 260 → 500 */
 export function maximumRond(max: number): number {
@@ -209,6 +209,7 @@ export class GraphiqueMois {
   evolution = input.required<{ mois: string; total: number }[]>();
   /** "AAAA-MM" du mois mis en avant */
   moisActif = input.required<string>();
+  devise = input('EUR');
   choisir = output<string>();
 
   private maximum = computed(() => maximumRond(Math.max(0, ...this.evolution().map((e) => e.total))));
@@ -218,7 +219,8 @@ export class GraphiqueMois {
     return [0.5, 1].map((part) => ({
       valeur: max * part,
       position: part * 100,
-      libelle: formatEuros(max * part).replace(/,00/, ''),
+      // Graduations rondes : pas de décimales ("1 000 €" plutôt que "1 000,00 €")
+      libelle: formatMontant(max * part, this.devise()).replace(/,00(?=\D*$)/, ''),
     }));
   });
 
@@ -229,7 +231,7 @@ export class GraphiqueMois {
       return {
         mois: e.mois,
         total: e.total,
-        montant: formatEuros(e.total),
+        montant: formatMontant(e.total, this.devise()),
         hauteur: (e.total / this.maximum()) * 100,
         libelleCourt: moisCourt.format(date),
         libelleLong: moisLong.format(date),

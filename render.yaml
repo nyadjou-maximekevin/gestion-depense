@@ -7,7 +7,8 @@ services:
     region: frankfurt # même région que la base Neon
     rootDir: backend
     # --include=dev : NODE_ENV=production ferait sauter les devDependencies (dont la CLI nest)
-    buildCommand: npm ci --include=dev && npm run build
+    # test -f : fait échouer le déploiement si la compilation a produit un dossier vide
+    buildCommand: npm ci --include=dev && npm run build && test -f dist/main.js
     startCommand: node dist/main.js
     healthCheckPath: /health
     envVars:

@@ -1,0 +1,52 @@
+<div class="auth-card carte">
+  <a class="retour" routerLink="/">← Retour au tableau de bord</a>
+
+  <div class="entete">
+    <h1>Paramètres</h1>
+    <p>Connecté avec {{ email }}</p>
+  </div>
+
+  @if (erreur()) {
+    <div class="alerte-erreur" role="alert">{{ erreur() }}</div>
+  }
+  @if (succes()) {
+    <div class="alerte-succes" role="status">✓ Paramètres enregistrés.</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="enregistrer()" novalidate>
+    <div class="field">
+      <label for="nom">Nom</label>
+      <input
+        id="nom"
+        type="text"
+        formControlName="nom"
+        autocomplete="name"
+        [class.invalide]="form.controls.nom.invalid && form.controls.nom.touched"
+      >
+      @if (form.controls.nom.invalid && form.controls.nom.touched) {
+        <span class="aide-erreur">Le nom est obligatoire.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="devise">Devise</label>
+      <select id="devise" formControlName="devise">
+        @for (d of devises; track d) {
+          <option [value]="d">{{ nomsDevises[d] }}</option>
+        }
+      </select>
+      <span class="aide">Aperçu : {{ apercu(deviseChoisie()) }}</span>
+    </div>
+
+    @if (deviseChoisie() !== deviseActuelle()) {
+      <div class="alerte-attention" role="note">
+        Les montants déjà saisis <strong>ne sont pas convertis</strong> : seule leur devise
+        d'affichage change (100 {{ deviseActuelle() }} deviendra 100 {{ deviseChoisie() }}).
+      </div>
+    }
+
+    <button class="btn btn-primary" type="submit" [disabled]="enCours() || form.pristine">
+      {{ enCours() ? 'Enregistrement…' : 'Enregistrer' }}
+    </button>
+  </form>
+</div>

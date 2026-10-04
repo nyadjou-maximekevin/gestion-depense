@@ -103,3 +103,37 @@ form {
   background: rgba(251, 191, 36, 0.08);
   border: 1px solid rgba(251, 191, 36, 0.25);
 }
+
+/* Page paramètres */
+.retour {
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+select {
+  color-scheme: dark;
+}
+
+.aide {
+  font-size: 0.82rem;
+  color: var(--text-faint);
+}
+
+.alerte-attention,
+.alerte-succes {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.alerte-attention {
+  color: #fde68a;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.alerte-succes {
+  color: #a7f3d0;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
